@@ -10,6 +10,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import SettingsPanel from '@/components/SettingsPanel';
 
 interface Chat {
   id: number;
@@ -43,6 +44,10 @@ const Index = () => {
   const [darkMode, setDarkMode] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [isMicMuted, setIsMicMuted] = useState(false);
+  const [isVideoMuted, setIsVideoMuted] = useState(false);
+  const [callTimer, setCallTimer] = useState(225);
 
   const chats: Chat[] = [
     {
@@ -450,7 +455,11 @@ const Index = () => {
             )}
           </div>
 
-          {showProfile && (
+          {showSettings && (
+            <SettingsPanel onClose={() => setShowSettings(false)} />
+          )}
+
+          {showProfile && !showSettings && (
             <div className="w-80 border-l border-border bg-card p-4 animate-slide-up">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-lg font-bold">Профиль</h2>
@@ -475,7 +484,14 @@ const Index = () => {
                   <Icon name="User" size={18} className="mr-3" />
                   Редактировать профиль
                 </Button>
-                <Button variant="ghost" className="w-full justify-start">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={() => {
+                    setShowProfile(false);
+                    setShowSettings(true);
+                  }}
+                >
                   <Icon name="Settings" size={18} className="mr-3" />
                   Настройки
                 </Button>
@@ -510,7 +526,9 @@ const Index = () => {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">03:45</span>
+              <span className="text-sm font-mono text-muted-foreground">
+                {Math.floor(callTimer / 60)}:{(callTimer % 60).toString().padStart(2, '0')}
+              </span>
               <Button
                 size="icon"
                 variant="ghost"
@@ -547,46 +565,81 @@ const Index = () => {
 
           <div className="p-6 bg-card/50 backdrop-blur-sm border-t border-border">
             <div className="flex items-center justify-center gap-4">
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-14 h-14 rounded-full bg-muted hover:bg-muted/80"
-              >
-                <Icon name="Mic" size={24} />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-14 h-14 rounded-full bg-muted hover:bg-muted/80"
-              >
-                <Icon name="Video" size={24} />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                onClick={toggleScreenShare}
-                className={`w-14 h-14 rounded-full ${
-                  isScreenSharing
-                    ? 'bg-primary text-white hover:bg-primary/90'
-                    : 'bg-muted hover:bg-muted/80'
-                }`}
-              >
-                <Icon name="Monitor" size={24} />
-              </Button>
-              <Button
-                size="icon"
-                variant="ghost"
-                className="w-14 h-14 rounded-full bg-muted hover:bg-muted/80"
-              >
-                <Icon name="Settings" size={24} />
-              </Button>
-              <Button
-                size="icon"
-                onClick={endVideoCall}
-                className="w-14 h-14 rounded-full bg-destructive hover:bg-destructive/90"
-              >
-                <Icon name="PhoneOff" size={24} />
-              </Button>
+              <div className="relative group">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setIsMicMuted(!isMicMuted)}
+                  className={`w-14 h-14 rounded-full transition-all ${
+                    isMicMuted
+                      ? 'bg-destructive hover:bg-destructive/90 text-white'
+                      : 'bg-muted hover:bg-muted/80'
+                  }`}
+                >
+                  <Icon name={isMicMuted ? 'MicOff' : 'Mic'} size={24} />
+                </Button>
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {isMicMuted ? 'Вкл. микрофон' : 'Выкл. микрофон'}
+                </span>
+              </div>
+              <div className="relative group">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => setIsVideoMuted(!isVideoMuted)}
+                  className={`w-14 h-14 rounded-full transition-all ${
+                    isVideoMuted
+                      ? 'bg-destructive hover:bg-destructive/90 text-white'
+                      : 'bg-muted hover:bg-muted/80'
+                  }`}
+                >
+                  <Icon name={isVideoMuted ? 'VideoOff' : 'Video'} size={24} />
+                </Button>
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {isVideoMuted ? 'Вкл. камеру' : 'Выкл. камеру'}
+                </span>
+              </div>
+              <div className="relative group">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={toggleScreenShare}
+                  className={`w-14 h-14 rounded-full transition-all ${
+                    isScreenSharing
+                      ? 'bg-primary text-white hover:bg-primary/90'
+                      : 'bg-muted hover:bg-muted/80'
+                  }`}
+                >
+                  <Icon name="Monitor" size={24} />
+                </Button>
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {isScreenSharing ? 'Остановить демо' : 'Демо экрана'}
+                </span>
+              </div>
+              <div className="relative group">
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="w-14 h-14 rounded-full bg-muted hover:bg-muted/80"
+                >
+                  <Icon name="MoreVertical" size={24} />
+                </Button>
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Ещё
+                </span>
+              </div>
+              <div className="relative group">
+                <Button
+                  size="icon"
+                  onClick={endVideoCall}
+                  className="w-14 h-14 rounded-full bg-destructive hover:bg-destructive/90 text-white"
+                >
+                  <Icon name="PhoneOff" size={24} />
+                </Button>
+                <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-xs opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Завершить
+                </span>
+              </div>
             </div>
           </div>
         </div>
