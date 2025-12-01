@@ -5,6 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 
 interface Chat {
   id: number;
@@ -28,6 +32,10 @@ const Index = () => {
   const [isVideoCall, setIsVideoCall] = useState(false);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [messageText, setMessageText] = useState('');
+  const [notifications, setNotifications] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [autoDownload, setAutoDownload] = useState(false);
+  const [darkMode, setDarkMode] = useState(true);
 
   const chats: Chat[] = [
     {
@@ -104,9 +112,119 @@ const Index = () => {
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
                   Telegadex
                 </h1>
-                <Button size="icon" variant="ghost" className="rounded-full">
-                  <Icon name="Settings" size={20} />
-                </Button>
+                <Sheet>
+                  <SheetTrigger asChild>
+                    <Button size="icon" variant="ghost" className="rounded-full">
+                      <Icon name="Settings" size={20} />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="left" className="w-80">
+                    <SheetHeader>
+                      <SheetTitle className="text-xl font-bold">Настройки</SheetTitle>
+                    </SheetHeader>
+                    <ScrollArea className="h-[calc(100vh-80px)] mt-6">
+                      <div className="space-y-6">
+                        <div>
+                          <h3 className="text-sm font-semibold mb-4 text-muted-foreground">УВЕДОМЛЕНИЯ</h3>
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="notifications" className="cursor-pointer">
+                                Показывать уведомления
+                              </Label>
+                              <Switch
+                                id="notifications"
+                                checked={notifications}
+                                onCheckedChange={setNotifications}
+                              />
+                            </div>
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="sound" className="cursor-pointer">
+                                Звук уведомлений
+                              </Label>
+                              <Switch
+                                id="sound"
+                                checked={soundEnabled}
+                                onCheckedChange={setSoundEnabled}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <h3 className="text-sm font-semibold mb-4 text-muted-foreground">МЕДИА</h3>
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="autodownload" className="cursor-pointer">
+                                Автозагрузка медиа
+                              </Label>
+                              <Switch
+                                id="autodownload"
+                                checked={autoDownload}
+                                onCheckedChange={setAutoDownload}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <h3 className="text-sm font-semibold mb-4 text-muted-foreground">ВНЕШНИЙ ВИД</h3>
+                          <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <Label htmlFor="darkmode" className="cursor-pointer">
+                                Тёмная тема
+                              </Label>
+                              <Switch
+                                id="darkmode"
+                                checked={darkMode}
+                                onCheckedChange={setDarkMode}
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <h3 className="text-sm font-semibold mb-4 text-muted-foreground">АККАУНТ</h3>
+                          <div className="space-y-3">
+                            <Button variant="ghost" className="w-full justify-start text-sm">
+                              <Icon name="User" size={18} className="mr-3" />
+                              Изменить профиль
+                            </Button>
+                            <Button variant="ghost" className="w-full justify-start text-sm">
+                              <Icon name="Lock" size={18} className="mr-3" />
+                              Конфиденциальность
+                            </Button>
+                            <Button variant="ghost" className="w-full justify-start text-sm">
+                              <Icon name="Database" size={18} className="mr-3" />
+                              Управление данными
+                            </Button>
+                          </div>
+                        </div>
+
+                        <Separator />
+
+                        <div>
+                          <h3 className="text-sm font-semibold mb-4 text-muted-foreground">О ПРИЛОЖЕНИИ</h3>
+                          <div className="space-y-3">
+                            <Button variant="ghost" className="w-full justify-start text-sm">
+                              <Icon name="Info" size={18} className="mr-3" />
+                              Версия 1.0.0
+                            </Button>
+                            <Button variant="ghost" className="w-full justify-start text-sm">
+                              <Icon name="HelpCircle" size={18} className="mr-3" />
+                              Помощь и поддержка
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </ScrollArea>
+                  </SheetContent>
+                </Sheet>
               </div>
               <div className="relative">
                 <Icon
